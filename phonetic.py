@@ -1,18 +1,44 @@
 import requests
 from bs4 import BeautifulSoup
-def read ( word ):
-    url = f'https://dict.revised.moe.edu.tw/search.jsp?md=1&word={word}#searchL'
+from urllib.parse import urljoin
 
-    html = requests.get( url )
-    bs = BeautifulSoup(html.text,'lxml')
-    data = bs.find('table', id='searchL')
+def read( word ):
+    if word == '國文':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=48'
+    elif word == '英文':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=49'
+    elif word == '數學':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=12'
+    elif word == '歷史':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=51'
+    elif word == '地理':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=52'
+    elif word == '公民':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=53'
+    elif word == '生物':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=54'
+    elif word == '理化':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=55'
+    elif word == '地球科學':
+        url = 'https://stv.naer.edu.tw/learning/junior.jsp?cat=56'
+    else:
+        return '沒有這個科目'
+
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    tab_content = soup.find('div', class_='tab-content')
     try:
-        row = data.find_all('tr')[2]
-        chinese = row.find('cr').text
-        phones = row.find_all('code')
-        phone = [e.text for e in phones]
-        s = " ".join( phone )
-        # s = row.find('sub')
-        return chinese + ' -> ' + s 
+      if tab_content:
+          links = tab_content.find_all('a', href=True)
+          for link in links:
+              title = link.find_previous('p', class_='resource-title')
+              if title:
+                  title_text = title.text.strip()
+                  href = urljoin(url, link['href'])
+                  print(f' [{title_text}] -> ')
+                  print(f'  {href}')
+
+      return f'以上是科目: {word} 的相關教材影片'           
     except:
-        return '查無此字' 
+      return '沒有這個科目關教材影片'
