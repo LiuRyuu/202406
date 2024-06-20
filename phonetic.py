@@ -29,16 +29,20 @@ def read( word ):
 
     tab_content = soup.find('div', class_='tab-content')
     try:
-      if tab_content:
-          links = tab_content.find_all('a', href=True)
-          for link in links:
-              title = link.find_previous('p', class_='resource-title')
-              if title:
-                  title_text = title.text.strip()
-                  href = urljoin(url, link['href'])
-                  return (f' [{title_text}] -> ')
-                  return (f'  {href}')
-
-      return f'以上是科目: {word} 的相關教材影片'           
+        if tab_content:
+            links = tab_content.find_all('a', href=True)
+            result = ''
+            for link in links:
+                title = link.find_previous('p', class_='resource-title')
+                if title:
+                    title_text = title.text.strip()
+                    href = urljoin(url, link['href'])
+                    result += f' [{title_text}]\n  {href}\n'
+            if result:
+                return f'以下是科目: {word} 的相關教材影片\n{result}'
+            else:
+                return f'沒有找到科目: {word} 的相關教材影片'
+        else:
+            return f'沒有找到科目: {word} 的相關教材影片'
     except:
       return '沒有這個科目關教材影片'
