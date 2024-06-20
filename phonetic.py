@@ -36,8 +36,8 @@ def read( word ):
               if title:
                   title_text = title.text.strip()
                   href = urljoin(url, link['href'])
-                  print(f' [{title_text}] -> ')
-                  print(f'  {href}')
+                  return (f' [{title_text}] -> ')
+                  return (f'  {href}')
 
       return f'以上是科目: {word} 的相關教材影片'           
     except:
